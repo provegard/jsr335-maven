@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.programmaticallyspeaking.jsr335</groupId>
+  <artifactId>jsr335-test</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>6.3.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <!-- Must use the 1.8/lambda compiler. -->
+          <fork>true</fork>
+          <executable>${env.JDK8_HOME}/bin/javac</executable>
+          <!-- Testing 1.8 features, 1.8 source requires 1.8 target. -->
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.11</version>
+        <configuration>
+          <!-- Use the 1.8/lambda JVM when forking. -->
+          <jvm>${env.JDK8_HOME}/bin/java</jvm>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <!-- Phase suitable for doing bytecode magic. -->
+            <phase>process-classes</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <target>
+            <!-- Run static weaver on classes, can use standard JVM. -->
+            <java
+              classpath="${env.DPROTO_HOME}/distrib/jsr335-agent.jar:${env.DPROTO_HOME}/lib/asm-4.0.jar"
+              classname="jsr335.agent.Main"
+              >
+              <arg value="-d" />
+              <arg value="${project.build.directory}/woven" />
+              <arg value="--jdk" />
+              <arg value="${env.JDK8_HOME}" />
+              <arg value="${project.build.outputDirectory}" />
+            </java>
+
+            <!-- Copy woven classes back to class dir. -->
+            <copy todir="${project.build.outputDirectory}">
+              <fileset dir="${project.build.directory}/woven" />
+            </copy>
+
+            <delete dir="${project.build.directory}/woven" />
+          </target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
