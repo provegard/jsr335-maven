@@ -1,0 +1,8 @@
+This is a small test project to demonstrate a Maven POM file that compiles
+and runs tests for Java code that uses lambdas and defender methods.
+
+The following environment variables must be set:
+
+JDK8_HOME - path to the j2sdk-image directory of the lambda build.
+DPROTO_HOME - path to the defender-prototype directory.
+
