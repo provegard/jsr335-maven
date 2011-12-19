@@ -56,13 +56,14 @@
         </executions>
         <configuration>
           <target>
+            <property name="woven.dir" value="${project.build.directory}/woven" />
             <!-- Run static weaver on classes, can use standard JVM. -->
             <java
               classpath="${env.DPROTO_HOME}/distrib/jsr335-agent.jar:${env.DPROTO_HOME}/lib/asm-4.0.jar"
               classname="jsr335.agent.Main"
               >
               <arg value="-d" />
-              <arg value="${project.build.directory}/woven" />
+              <arg value="${woven.dir}" />
               <arg value="--jdk" />
               <arg value="${env.JDK8_HOME}" />
               <arg value="${project.build.outputDirectory}" />
@@ -70,10 +71,10 @@
 
             <!-- Copy woven classes back to class dir. -->
             <copy todir="${project.build.outputDirectory}">
-              <fileset dir="${project.build.directory}/woven" />
+              <fileset dir="${woven.dir}" />
             </copy>
 
-            <delete dir="${project.build.directory}/woven" />
+            <delete dir="${woven.dir}" />
           </target>
         </configuration>
       </plugin>
